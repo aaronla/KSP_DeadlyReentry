@@ -19,9 +19,9 @@ namespace DeadlyReentry
     {
         AerodynamicsFX afx;
 
-        public float Multiplier = 1.73512E-12f;
-        public float DensityExponent = 2f;
-        public float VelocityExponent = 6f;
+		public float Multiplier = 0.0000000116f;
+        public float DensityExponent = 1.5f;
+        public float VelocityExponent = 4.5f;
 
         public float CommandPodLeniency = 0.35f;
         public float EffectVariability = 0.1f;
@@ -30,7 +30,7 @@ namespace DeadlyReentry
         public float maxheatfail = 0;
         public float reentryTemperature = 0;
 
-        public float HeatDiffusionHalflife = 0.5f; // seconds
+        public float HeatDiffusionHalflife = 1.0f; // seconds
 
         protected bool debugging = false;
         protected bool moreUI = false;
@@ -87,10 +87,8 @@ namespace DeadlyReentry
                             ray.direction = (p.Rigidbody.GetPointVelocity(p.transform.position) + Krakensbane.GetFrameVelocityV3f() - Krakensbane.GetLastCorrection() * TimeWarp.fixedDeltaTime).normalized;
                             ray.origin = p.transform.position;
 
-                            if (!Physics.Raycast(ray, 10))
-                            {
-                                p.temperature = Heating(p);
-                            }
+							var forwardFacing = !Physics.Raycast(ray, 10);
+                            p.temperature = Heating(p, forwardFacing);
                         }
                     }
                 }
@@ -112,7 +110,7 @@ namespace DeadlyReentry
 
         private static float ln_of_2 = Mathf.Log(2);
 
-        private float Heating (Part part)
+        private float Heating (Part part, bool forwardFacing)
         {
             var temperature = part.temperature;
             var effectiveReentryTemperature = reentryTemperature;
@@ -128,6 +126,9 @@ namespace DeadlyReentry
                 // vary rate on parts so they fail at different times. Use uid for repeatability.
                 effectiveReentryTemperature *= Mathf.Clamp01(1.0f - ((part.uid&0xff)/255.0f*EffectVariability));
             }
+
+			if (!forwardFacing)
+				effectiveReentryTemperature *= .5f;
 
             if (effectiveReentryTemperature < temperature) 
             {
