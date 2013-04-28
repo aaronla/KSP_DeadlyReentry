@@ -19,7 +19,7 @@ namespace DeadlyReentry
     {
         AerodynamicsFX afx;
 
-		public float Multiplier = 0.0000000116f;
+		public float Multiplier = 0.0000000126f;
         public float DensityExponent = 1.5f;
         public float VelocityExponent = 4.5f;
 
@@ -30,7 +30,7 @@ namespace DeadlyReentry
         public float maxheatfail = 0;
         public float reentryTemperature = 0;
 
-        public float HeatDiffusionHalflife = 1.0f; // seconds
+        public float HeatDiffusionHalflife = 0.3f; // seconds
 
         protected bool debugging = false;
         protected bool moreUI = false;
@@ -93,7 +93,7 @@ namespace DeadlyReentry
                     }
                 }
 
-                if (debugging && moreUI)
+                if (debugging)
                 {
                     maxheat = (from p in FlightGlobals.ActiveVessel.Parts 
                                select p.temperature).Max();
